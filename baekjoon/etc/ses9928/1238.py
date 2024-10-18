@@ -26,23 +26,22 @@ def dijkstra(n, roads, start):
 n, m, x = list(map(int, input().split(' ')))
 
 roads = [[] for _ in range(n)]
-reverse_roads = [[] for _ in range(n)]
 
 # 도로 입력
 for _ in range(m):
     start, end, cost = list(map(int, input().split(' ')))
-    roads[start - 1].append((end - 1, cost))  # 정방향 도로
-    reverse_roads[end - 1].append((start - 1, cost))  # 역방향 도로
+    roads[start - 1].append((end - 1, cost))  # 정방향 도로만 저장
 
 # 1. X에서 다른 노드로 가는 최단 경로
 to_nodes_from_x = dijkstra(n, roads, x - 1)
 
-# 2. 다른 노드에서 X로 가는 최단 경로 (도로를 역방향으로 사용)
-from_nodes_to_x = dijkstra(n, reverse_roads, x - 1)
-
-# 3. 각 노드에서 X까지의 왕복 시간이 가장 긴 경우 계산
+# 2. 각 노드에서 X로 가는 최단 경로 계산 (모든 노드에서 다익스트라 실행)
 answer = 0
 for i in range(n):
-    answer = max(answer, to_nodes_from_x[i] + from_nodes_to_x[i])
+    if i == x - 1:
+        continue
+    from_i_to_x = dijkstra(n, roads, i)[x - 1]  # i에서 출발하여 X까지의 최단 거리
+    # 왕복 시간 계산 (i -> X -> i)
+    answer = max(answer, to_nodes_from_x[i] + from_i_to_x)
 
 print(answer)
